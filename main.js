@@ -47,40 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const weeklySnapshot = await weeklyRef.once("value");
     const allTimes = weeklySnapshot.val() || [];
 
-    // 🔄 تحقق أولاً إذا كان الميعاد محجوز بالفعل
-    const appointmentsRef = firebase.database().ref("appointments");
-    appointmentsRef
-      .orderByChild("day")
-      .equalTo(dateStr)
-      .once("value")
-      .then((snapshot) => {
-        let alreadyBooked = false;
-
-        snapshot.forEach((childSnap) => {
-          const data = childSnap.val();
-          if (data.time === time) {
-            alreadyBooked = true;
-          }
-        });
-
-        if (alreadyBooked) {
-          alert("⚠️ هذا الميعاد محجوز بالفعل، برجاء اختيار وقت آخر.");
-          return;
-        }
-
-        // ✅ لو الميعاد متاح نكمل الحجز
-        return appointmentsRef.push(appointment).then(() => {
-          alert("✅ تم حجز الموعد بنجاح!");
-          form.reset();
-          cal.valueAsDate = new Date();
-          cal.dispatchEvent(new Event("change"));
-        });
-      })
-      .catch((error) => {
-        console.error("❌ حدث خطأ أثناء التحقق أو الحجز:", error);
-        alert("❌ حدث خطأ! حاول مرة أخرى.");
-      });
-
+    const appointmentsRef = db.ref("appointments");
     const appointmentsSnapshot = await appointmentsRef.once("value");
     const bookedTimes = [];
 
